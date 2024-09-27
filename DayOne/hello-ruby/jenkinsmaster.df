@@ -1,0 +1,28 @@
+#Use an official jenkins runtime as the base image
+FROM jenkins/jenkins:lts
+
+#skip setup wizard
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
+
+#Change to root user for installation of packages
+USER root
+
+#Install Docker inside Jenkins container
+RUN apt-get update && \
+apt-get install -y apt-transport-https \
+ca-certificates curl gnupg2 \
+software-properties-common && \
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && \
+apt-get update && \
+apt-get install -y docker-ce-cli
+
+#Adding the docker group
+RUN groupadd docker && \
+usermod -aG docker jenkins
+
+#Install Jenkins Docker plugin
+RUN jenkins-plugin-cli --plugins docker-plugin
+
+#Change user back to jenkins
+USER jenkins

@@ -1,0 +1,12 @@
+#Use jenkins/inbound as the base image
+FROM jenkins/inbound-agent:alpine
+
+#Change to root user for package installation
+USER root
+
+#Install Ruby
+RUN apk update && \
+apk add ruby ruby-dev build-base
+
+#change back to jenkins user
+USER jenkins

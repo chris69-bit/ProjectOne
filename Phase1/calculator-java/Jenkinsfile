@@ -1,0 +1,59 @@
+pipeline{
+    agent{
+        label "node"
+    }
+    stages{
+        stage("Checkout SCM"){
+            steps{ // sourcing the code from the git repo this is for demonstration purpose
+                git branch: "main", url:"https://github.com/chris69-bit/ProjectOne.git"
+
+            }
+        }
+
+        stage("Building"){
+            steps{ // build an artifact from your code
+                sh "./gradlew build"
+            }
+        }
+
+        stage("Building an image from the jar file"){
+            steps{ // the dockerfile is available in the source code
+                sh "docker build -f javacalc.df -t javacalculator ."
+            }
+        }
+
+        stage("Pushing to docker registry"){
+            steps{ // THis involves tagging the built image and also doing the push
+                sh "docker tag javacalculator chrispined/java-stuff:java-calc-1.1"
+                sh "docker push chrispined/java-stuff:java-calc-1.1"
+
+            }
+        }
+
+        stage("Deploy to staging"){
+            steps{// The created image is run
+                sh "docker run -d --rm -p 8089:8080 --name calculatingjava chrispined/java-stuff:java-calc-1.1"
+
+            }
+        }
+
+        stage("Acceptance test"){
+            steps{
+                sleep 60
+                sh "./acceptance_test.sh"
+            }
+
+        }
+    }
+    post{
+        always{
+            sh "docker stop calculatingjava"
+        }
+        success{
+            echo "========pipeline executed successfully ========"
+        }
+        failure{
+            echo "========pipeline execution failed========"
+        }
+    }
+}

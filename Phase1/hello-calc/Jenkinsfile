@@ -1,0 +1,29 @@
+pipeline{
+    agent any
+    stages{
+        stage("Checkout"){
+            steps{ // cloning the repository
+            git branch: "main", url:"https://github.com/chris69-bit/ProjectOneofTwenty.git"
+            }
+            
+        }
+
+        stage("Test"){
+            steps{ // unittesting the calc.py
+            sh "python3 -m unittest discover -s ."
+
+            }
+        }
+    }
+    post{
+        always{
+            echo "The pipeline execution was completed"
+        }
+        success{
+            echo "The tests was successfull"
+        }
+        failure{
+            echo "========pipeline execution failed========"
+        }
+    }
+}

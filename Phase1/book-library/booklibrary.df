@@ -1,0 +1,23 @@
+#Use an official Ruby image as the base image
+FROM ruby:2.7
+
+#Install dependencies
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs
+
+#Set the working directory
+WORKDIR /app
+
+#Copy the Gemfile and Gemfile.lock into the container
+COPY Gemfile* /app
+
+#Install the gems
+RUN bundle install
+
+#Copy the entire app
+COPY . /app
+
+#Expose port 4567 for sinatra
+EXPOSE 4567
+
+#Command to run the Sinatra application
+CMD ["ruby", "app.rb"]

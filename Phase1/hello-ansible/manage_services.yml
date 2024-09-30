@@ -1,0 +1,62 @@
+---
+
+- name: Manage Web 
+  hosts: web
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+
+    - name: Start and enable NGINX
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+- name: Manage Database service
+  hosts: db
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Install PostgreSQL
+      apt:
+        name: postgresql
+        state: present
+
+    - name: Start and enable PostgreSQL
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Ensure database exists
+      postgresql_db:
+        name: my_database
+        state: present
+
+    - name: Ensure a user for the database exists
+      postgresql_user:
+        name: my_user
+        password: my_password
+        priv: ALL PRIVILEGES
+        db: mhy_database
+        state: present
+
+- name: Manage cache Services
+  hosts: cache
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Install Redis
+      apt:
+        name: redis-server
+        state: present
+
+    - name: Start and enable Redis
+      service:
+        name: redis-server
+        state: started
+        enabled: yes

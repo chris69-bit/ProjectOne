@@ -1,0 +1,17 @@
+#Use an official python runtime as the base image
+FROM python:3.9-slim
+
+#Create a working directory in the container
+WORKDIR /app
+
+#Copy the contents of the current directory to the container's working directory
+COPY . /app
+
+#Install dependencies
+RUN pip install -r requirement.txt
+
+#Expose port 8080
+EXPOSE 8080
+
+#Run my-app.py when container launches
+CMD ["python", "my-app.py"]

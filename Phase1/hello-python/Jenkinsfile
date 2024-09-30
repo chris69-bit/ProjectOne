@@ -1,0 +1,39 @@
+pipeline{
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "hello-python-service"
+        DOCKER_TAG = "${DOCKER_IMAGE}:${env.BUILD_ID}-${new Date().format('yyyyMMddHHmmss')}"
+
+    }
+    stages{
+        stage("Docker Build"){
+            steps{ // Build an image from the docker file
+            sh ''' docker build -f simplepython.df -t ${DOCKER_TAG} .
+            ''' 
+            }
+        }
+
+        stage('Performance Testing') {
+            steps {
+                script {
+                    // Run the performance test script
+                    sh '''
+                    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd /path/to/deployed/app && ./performance_test.sh"
+                    '''
+                }
+            }
+        }
+    }
+    post{
+        always{
+            echo "========always========"
+        }
+        success{
+            echo "========pipeline executed successfully ========"
+        }
+        failure{
+            echo "========pipeline execution failed========"
+        }
+    }
+}

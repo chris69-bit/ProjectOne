@@ -1,0 +1,33 @@
+pipeline{
+    agent any
+
+    stages{
+        stage("Checkout code"){
+            steps{
+                git branch: "main", url: "https://github.com/chris69-bit/ProjectOne.git"
+
+            }
+        }
+
+        stage("Build"){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+
+        stage("Archive Artifacts"){
+            steps{
+                archiveArtifacts artifacts: "target/*.jar", allowEmptyArchive: false
+            }
+        }
+    }
+    post{
+        success{
+            echo "========pipeline executed successfully ========"
+        }
+        failure{
+            echo "========pipeline execution failed========"
+        }
+    }
+
+}
